@@ -76,20 +76,20 @@ def style(fig, **overrides):
 @st.cache_data
 def load_data():
     files = [
-        r"C:\Users\ievak\Downloads\Spotify Extended Streaming History\Streaming_History_Audio_2023.json",
-        r"C:\Users\ievak\Downloads\Spotify Extended Streaming History\Streaming_History_Audio_2024.json",
-        r"C:\Users\ievak\Downloads\Spotify Extended Streaming History\Streaming_History_Audio_2024_1.json",
-        r"C:\Users\ievak\Downloads\Spotify Extended Streaming History\Streaming_History_Audio_2025.json",
-        r"C:\Users\ievak\Downloads\Spotify Extended Streaming History\Streaming_History_Audio_2025_1.json",
-        r"C:\Users\ievak\Downloads\Spotify Extended Streaming History\Streaming_History_Audio_2026.json",
+        "Streaming_History_Audio_2023.csv",
+        "Streaming_History_Audio_2024.csv",
+        "Streaming_History_Audio_2024_1.csv",
+        "Streaming_History_Audio_2025.csv",
+        "Streaming_History_Audio_2025_1.csv",
+        "Streaming_History_Audio_2026.csv",
     ]
-    df = pd.concat([pd.read_json(f) for f in files], ignore_index=True)
+    df = pd.concat([pd.read_csv(f) for f in files], ignore_index=True)
     df = df.drop(columns=[
         "platform", "ip_addr", "episode_name", "episode_show_name",
         "spotify_episode_uri", "audiobook_title", "audiobook_uri",
         "audiobook_chapter_uri", "audiobook_chapter_title",
         "offline", "offline_timestamp", "incognito_mode",
-    ])
+    ], errors="ignore")
     df["ms_played"] = df["ms_played"] / 1000
     df["ts"] = pd.to_datetime(df["ts"])
     df["year"] = df["ts"].dt.year
@@ -99,7 +99,6 @@ def load_data():
     df["min_played"] = df["ms_played"] / 60
     day_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     df["weekday"] = pd.Categorical(df["weekday"], categories=day_order, ordered=True)
-    # Drop rows with no track name (podcasts, unknown streams)
     df = df.dropna(subset=["master_metadata_track_name"])
     return df
 
